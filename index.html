@@ -29,6 +29,9 @@
     .card-header {
       padding: 20px;
       border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .card-title {
@@ -36,6 +39,14 @@
       font-weight: bold;
       text-align: center;
       margin: 0;
+    }
+
+    .language-switch {
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
     }
 
     .card-content {
@@ -151,7 +162,11 @@
   <div class="container">
     <div class="card">
       <div class="card-header">
-        <h1 class="card-title">支付平台費用計算器</h1>
+        <h1 class="card-title" data-zh="支付平台費用計算器" data-en="Payment Platform Fee Calculator">支付平台費用計算器</h1>
+        <select class="language-switch" onchange="switchLanguage(this.value)">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
       </div>
       <div class="card-content">
         <div class="tabs">
@@ -162,23 +177,23 @@
         <!-- PayPal Tab Content -->
         <div id="paypal-content" class="tab-content active">
           <div class="input-group">
-            <label>交易金額 (TWD):</label>
+            <label data-zh="交易金額 (TWD):" data-en="Transaction Amount (TWD):">交易金額 (TWD):</label>
             <input type="number" value="303" min="0" step="1" id="amount-twd" oninput="calculatePayPal()">
           </div>
 
           <div class="radio-group">
             <label>
               <input type="radio" name="transaction-type" checked onchange="calculatePayPal()">
-              跨境交易 (4.4% + 固定費用)
+              <span data-zh="跨境交易 (4.4% + 固定費用)" data-en="Cross-border Transaction (4.4% + Fixed Fee)">跨境交易 (4.4% + 固定費用)</span>
             </label>
             <label>
               <input type="radio" name="transaction-type" onchange="calculatePayPal()">
-              本地交易 (2.9% + 固定費用)
+              <span data-zh="本地交易 (2.9% + 固定費用)" data-en="Local Transaction (2.9% + Fixed Fee)">本地交易 (2.9% + 固定費用)</span>
             </label>
           </div>
 
           <div class="input-group">
-            <label>匯率設定</label>
+            <label data-zh="匯率設定" data-en="Exchange Rate">匯率設定</label>
             <div class="exchange-rate-group">
               <span>1 TWD = </span>
               <input type="number" value="0.033" step="0.0001" min="0" id="exchange-rate" oninput="calculatePayPal()">
@@ -186,76 +201,45 @@
             </div>
           </div>
 
-          <div id="paypal-results">
-            <div class="result-row">
-              <span>交易金額:</span>
-              <div class="amount-display">
-                <div class="primary-amount">NT$303</div>
-                <div class="secondary-amount">$10.00</div>
-              </div>
-            </div>
-
-            <div class="result-row">
-              <span>比例費用 (4.4%):</span>
-              <div class="amount-display fee">
-                <div class="primary-amount">-NT$13</div>
-                <div class="secondary-amount">-$0.44</div>
-              </div>
-            </div>
-
-            <div class="result-row">
-              <span>固定費用:</span>
-              <div class="amount-display fee">
-                <div class="primary-amount">-NT$10</div>
-                <div class="secondary-amount">-$0.33</div>
-              </div>
-            </div>
-
-            <div class="result-row border-top">
-              <span>總費用:</span>
-              <div class="amount-display fee">
-                <div class="primary-amount">-NT$23</div>
-                <div class="secondary-amount">-$0.77</div>
-              </div>
-            </div>
-
-            <div class="result-row border-top">
-              <span class="final-amount">最終收到金額:</span>
-              <div class="amount-display">
-                <div class="final-amount">NT$280</div>
-                <div class="final-amount" style="font-size: 0.875rem;">$9.23</div>
-              </div>
-            </div>
-          </div>
+          <div id="paypal-results"></div>
         </div>
 
         <!-- Tebex Tab Content -->
         <div id="tebex-content" class="tab-content">
           <div class="input-group">
-            <label>原始金額 ($):</label>
+            <label data-zh="原始金額 ($):" data-en="Original Amount ($):">原始金額 ($):</label>
             <input type="number" value="10.00" min="0" step="0.01" id="amount-usd" oninput="calculateTebex()">
           </div>
 
           <div class="input-group">
             <label>
               <input type="checkbox" id="use-discount" onchange="calculateTebex()">
-              啟用折扣
+              <span data-zh="啟用折扣" data-en="Enable Discount">啟用折扣</span>
             </label>
             <div id="discount-input" style="display: none; margin-top: 8px;">
               <input type="number" value="0.9" min="0" max="1" step="0.1" id="discount-rate" oninput="calculateTebex()">
-              <span>折 (例：0.9 = 9折)</span>
+              <span data-zh="折 (例：0.9 = 9折)" data-en="off (e.g., 0.9 = 10% off)">折 (例：0.9 = 9折)</span>
             </div>
           </div>
 
-          <div id="tebex-results">
-            <!-- Tebex results will be populated by JavaScript -->
-          </div>
+          <div id="tebex-results"></div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    let currentLang = 'zh';
+    
+    function switchLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('[data-zh][data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+      });
+      calculatePayPal();
+      calculateTebex();
+    }
+
     function switchTab(tabName) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -283,10 +267,17 @@
       const finalAmountTWD = amountTWD - totalFeeTWD;
       const finalAmountUSD = amountUSD - totalFeeUSD;
 
-      // Update results in the DOM
+      const labels = {
+        transactionAmount: { zh: '交易金額:', en: 'Transaction Amount:' },
+        percentageFee: { zh: `比例費用 (${rate * 100}%):`, en: `Percentage Fee (${rate * 100}%):` },
+        fixedFee: { zh: '固定費用:', en: 'Fixed Fee:' },
+        totalFee: { zh: '總費用:', en: 'Total Fee:' },
+        finalAmount: { zh: '最終收到金額:', en: 'Final Amount:' }
+      };
+
       document.getElementById('paypal-results').innerHTML = `
         <div class="result-row">
-          <span>交易金額:</span>
+          <span>${labels.transactionAmount[currentLang]}</span>
           <div class="amount-display">
             <div class="primary-amount">NT$${amountTWD.toFixed(0)}</div>
             <div class="secondary-amount">$${amountUSD.toFixed(2)}</div>
@@ -294,7 +285,7 @@
         </div>
 
         <div class="result-row">
-          <span>比例費用 (${rate * 100}%):</span>
+          <span>${labels.percentageFee[currentLang]}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-NT$${percentageFeeTWD.toFixed(0)}</div>
             <div class="secondary-amount">-$${percentageFeeUSD.toFixed(2)}</div>
@@ -302,7 +293,7 @@
         </div>
 
         <div class="result-row">
-          <span>固定費用:</span>
+          <span>${labels.fixedFee[currentLang]}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-NT$${fixedFeeTWD.toFixed(0)}</div>
             <div class="secondary-amount">-$${fixedFeeUSD.toFixed(2)}</div>
@@ -310,7 +301,7 @@
         </div>
 
         <div class="result-row border-top">
-          <span>總費用:</span>
+          <span>${labels.totalFee[currentLang]}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-NT$${totalFeeTWD.toFixed(0)}</div>
             <div class="secondary-amount">-$${totalFeeUSD.toFixed(2)}</div>
@@ -318,7 +309,7 @@
         </div>
 
         <div class="result-row border-top">
-          <span class="final-amount">最終收到金額:</span>
+          <span class="final-amount">${labels.finalAmount[currentLang]}</span>
           <div class="amount-display">
             <div class="final-amount">NT$${finalAmountTWD.toFixed(0)}</div>
             <div class="final-amount" style="font-size: 0.875rem;">$${finalAmountUSD.toFixed(2)}</div>
@@ -340,48 +331,37 @@
       const totalFees = tebexFee + paypalFee;
       const finalAmount = discountedAmount - totalFees;
 
-      // Update results in the DOM
+      const labels = {
+        originalAmount: { zh: '原始金額:', en: 'Original Amount:' },
+        discountAmount: { zh: '折扣金額:', en: 'Discount Amount:' },
+        discountedAmount: { zh: '折扣後金額:', en: 'Discounted Amount:' },
+        tebexFee: { zh: 'Tebex 費用 (10%):', en: 'Tebex Fee (10%):' },
+        paypalFee: { zh: 'PayPal 費用 (2.9% + $0.30):', en: 'PayPal Fee (2.9% + $0.30):' },
+        totalFee: { zh: '總費用:', en: 'Total Fee:' },
+        finalAmount: { zh: '最終收到金額:', en: 'Final Amount:' }
+      };
+
       document.getElementById('tebex-results').innerHTML = `
-        <div class="result-row">
-          <span>原始金額:</span>
-          <div class="amount-display">
-            <div class="primary-amount">$${amount.toFixed(2)}</div>
-          </div>
-        </div>
-        ${useDiscount ? `
-          <div class="result-row">
-            <span>折扣金額:</span>
-            <div class="amount-display fee">
-              <div class="primary-amount">-$${(amount - discountedAmount).toFixed(2)}</div>
-            </div>
-          </div>
-          <div class="result-row">
-            <span>折扣後金額:</span>
-            <div class="amount-display">
-              <div class="primary-amount">$${discountedAmount.toFixed(2)}</div>
-            </div>
-          </div>
-        ` : ''}
-        <div class="result-row">
-          <span>Tebex 費用 (10%):</span>
+<div class="result-row">
+          <span>${labels.tebexFee[currentLang]}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-$${tebexFee.toFixed(2)}</div>
           </div>
         </div>
         <div class="result-row">
-          <span>PayPal 費用 (2.9% + $0.30):</span>
+          <span>${labels.paypalFee[currentLang]}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-$${paypalFee.toFixed(2)}</div>
           </div>
         </div>
         <div class="result-row border-top">
-          <span>總費用:</span>
+          <span>${labels.totalFee[currentLang]}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-$${totalFees.toFixed(2)}</div>
           </div>
         </div>
         <div class="result-row border-top">
-          <span class="final-amount">最終收到金額:</span>
+          <span class="final-amount">${labels.finalAmount[currentLang]}</span>
           <div class="amount-display">
             <div class="final-amount">$${finalAmount.toFixed(2)}</div>
           </div>
