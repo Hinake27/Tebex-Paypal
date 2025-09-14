@@ -10,25 +10,27 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      background-color: #f0f2f5;
+      background: linear-gradient(135deg, #f9fafb, #e0e7ff);
       color: #333;
     }
 
     .container {
       width: 100%;
-      max-width: 400px;
+      max-width: 480px;
       padding: 20px;
     }
 
     .card {
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
     }
 
     .card-header {
       padding: 20px;
-      border-bottom: 1px solid #eee;
+      background: #2563eb;
+      color: white;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -37,15 +39,16 @@
     .card-title {
       font-size: 1.5rem;
       font-weight: bold;
-      text-align: center;
       margin: 0;
     }
 
     .language-switch {
       padding: 4px 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      border: none;
+      border-radius: 6px;
       background: white;
+      color: #2563eb;
+      font-weight: 500;
       cursor: pointer;
     }
 
@@ -55,7 +58,7 @@
 
     .tabs {
       display: flex;
-      border-bottom: 1px solid #eee;
+      border-bottom: 2px solid #eee;
       margin-bottom: 20px;
     }
 
@@ -66,12 +69,14 @@
       cursor: pointer;
       font-weight: 500;
       color: #666;
-      border-bottom: 2px solid transparent;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
     }
 
     .tab.active {
       color: #2563eb;
       border-bottom-color: #2563eb;
+      font-weight: 600;
     }
 
     .tab-content {
@@ -83,33 +88,54 @@
     }
 
     .input-group {
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .input-group label {
       display: block;
       margin-bottom: 8px;
-      font-weight: 500;
+      font-weight: 600;
+      color: #444;
     }
 
     input[type="number"],
     input[type="text"] {
       width: 100%;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 15px;
     }
 
-    input[type="radio"],
-    input[type="checkbox"] {
-      margin-right: 8px;
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .result-card {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+      border: 1px solid #e5e7eb;
     }
 
     .result-row {
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
+      border-bottom: 1px dashed #ddd;
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: 500;
+      color: #555;
     }
 
     .amount-display {
@@ -117,11 +143,12 @@
     }
 
     .primary-amount {
-      font-weight: 500;
+      font-weight: bold;
+      font-size: 1.1rem;
     }
 
     .secondary-amount {
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       color: #666;
     }
 
@@ -132,29 +159,7 @@
     .final-amount {
       color: #059669;
       font-weight: bold;
-    }
-
-    .border-top {
-      border-top: 1px solid #eee;
-      padding-top: 12px;
-      margin-top: 12px;
-    }
-
-    .exchange-rate-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .exchange-rate-group input {
-      flex: 1;
-    }
-
-    .radio-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
+      font-size: 1.2rem;
     }
   </style>
 </head>
@@ -174,7 +179,7 @@
           <div class="tab active" onclick="switchTab('paypal')">PayPal</div>
         </div>
 
-        <!-- PayPal Tab Content -->
+        <!-- PayPal -->
         <div id="paypal-content" class="tab-content active">
           <div class="input-group">
             <label data-zh="交易金額 (TWD):" data-en="Transaction Amount (TWD):">交易金額 (TWD):</label>
@@ -194,17 +199,17 @@
 
           <div class="input-group">
             <label data-zh="匯率設定" data-en="Exchange Rate">匯率設定</label>
-            <div class="exchange-rate-group">
-              <span>1 TWD = </span>
-              <input type="number" value="0.033" step="0.0001" min="0" id="exchange-rate" oninput="calculatePayPal()">
-              <span>USD</span>
+            <div>
+              <span>1 USD = </span>
+              <input type="number" value="30.31" step="0.01" min="0" id="exchange-rate" oninput="calculatePayPal()">
+              <span>TWD</span>
             </div>
           </div>
 
-          <div id="paypal-results"></div>
+          <div id="paypal-results" class="result-card"></div>
         </div>
 
-        <!-- Tebex Tab Content -->
+        <!-- Tebex -->
         <div id="tebex-content" class="tab-content">
           <div class="input-group">
             <label data-zh="原始金額 ($):" data-en="Original Amount ($):">原始金額 ($):</label>
@@ -222,7 +227,7 @@
             </div>
           </div>
 
-          <div id="tebex-results"></div>
+          <div id="tebex-results" class="result-card"></div>
         </div>
       </div>
     </div>
@@ -230,7 +235,7 @@
 
   <script>
     let currentLang = 'zh';
-    
+
     function switchLanguage(lang) {
       currentLang = lang;
       document.querySelectorAll('[data-zh][data-en]').forEach(el => {
@@ -243,17 +248,18 @@
     function switchTab(tabName) {
       document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
+
       const selectedTab = document.querySelector(`.tab:nth-child(${tabName === 'tebex' ? '1' : '2'})`);
       const selectedContent = document.getElementById(`${tabName}-content`);
-      
+
       selectedTab.classList.add('active');
       selectedContent.classList.add('active');
     }
 
     function calculatePayPal() {
       const amountTWD = parseFloat(document.getElementById('amount-twd').value) || 0;
-      const exchangeRate = parseFloat(document.getElementById('exchange-rate').value) || 0.033;
+      const exchangeRateInput = parseFloat(document.getElementById('exchange-rate').value) || 30.31;
+      const exchangeRate = 1 / exchangeRateInput; // 轉成 1 TWD = ? USD
       const isCrossBorder = document.querySelector('input[name="transaction-type"]').checked;
       const rate = isCrossBorder ? 0.044 : 0.029;
       const fixedFeeTWD = 10;
@@ -267,52 +273,44 @@
       const finalAmountTWD = amountTWD - totalFeeTWD;
       const finalAmountUSD = amountUSD - totalFeeUSD;
 
-      const labels = {
-        transactionAmount: { zh: '交易金額:', en: 'Transaction Amount:' },
-        percentageFee: { zh: `比例費用 (${rate * 100}%):`, en: `Percentage Fee (${rate * 100}%):` },
-        fixedFee: { zh: '固定費用:', en: 'Fixed Fee:' },
-        totalFee: { zh: '總費用:', en: 'Total Fee:' },
-        finalAmount: { zh: '最終收到金額:', en: 'Final Amount:' }
-      };
-
       document.getElementById('paypal-results').innerHTML = `
         <div class="result-row">
-          <span>${labels.transactionAmount[currentLang]}</span>
+          <span class="label">${currentLang === 'zh' ? '交易金額' : 'Transaction Amount'}</span>
           <div class="amount-display">
             <div class="primary-amount">NT$${amountTWD.toFixed(0)}</div>
-            <div class="secondary-amount">$${amountUSD.toFixed(2)}</div>
+            <div class="secondary-amount">USD $${amountUSD.toFixed(2)}</div>
           </div>
         </div>
 
         <div class="result-row">
-          <span>${labels.percentageFee[currentLang]}</span>
+          <span class="label">${currentLang === 'zh' ? '比例費用' : 'Percentage Fee'} (${(rate * 100).toFixed(1)}%)</span>
           <div class="amount-display fee">
             <div class="primary-amount">-NT$${percentageFeeTWD.toFixed(0)}</div>
-            <div class="secondary-amount">-$${percentageFeeUSD.toFixed(2)}</div>
+            <div class="secondary-amount">-USD $${percentageFeeUSD.toFixed(2)}</div>
           </div>
         </div>
 
         <div class="result-row">
-          <span>${labels.fixedFee[currentLang]}</span>
+          <span class="label">${currentLang === 'zh' ? '固定費用' : 'Fixed Fee'}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-NT$${fixedFeeTWD.toFixed(0)}</div>
-            <div class="secondary-amount">-$${fixedFeeUSD.toFixed(2)}</div>
+            <div class="secondary-amount">-USD $${fixedFeeUSD.toFixed(2)}</div>
           </div>
         </div>
 
-        <div class="result-row border-top">
-          <span>${labels.totalFee[currentLang]}</span>
+        <div class="result-row">
+          <span class="label">${currentLang === 'zh' ? '總費用' : 'Total Fee'}</span>
           <div class="amount-display fee">
             <div class="primary-amount">-NT$${totalFeeTWD.toFixed(0)}</div>
-            <div class="secondary-amount">-$${totalFeeUSD.toFixed(2)}</div>
+            <div class="secondary-amount">-USD $${totalFeeUSD.toFixed(2)}</div>
           </div>
         </div>
 
-        <div class="result-row border-top">
-          <span class="final-amount">${labels.finalAmount[currentLang]}</span>
+        <div class="result-row">
+          <span class="label final-amount">${currentLang === 'zh' ? '最終收到金額' : 'Final Amount'}</span>
           <div class="amount-display">
             <div class="final-amount">NT$${finalAmountTWD.toFixed(0)}</div>
-            <div class="final-amount" style="font-size: 0.875rem;">$${finalAmountUSD.toFixed(2)}</div>
+            <div class="secondary-amount final-amount">USD $${finalAmountUSD.toFixed(2)}</div>
           </div>
         </div>
       `;
@@ -322,7 +320,7 @@
       const amount = parseFloat(document.getElementById('amount-usd').value) || 0;
       const useDiscount = document.getElementById('use-discount').checked;
       const discountRate = parseFloat(document.getElementById('discount-rate').value) || 0.9;
-      
+
       document.getElementById('discount-input').style.display = useDiscount ? 'block' : 'none';
 
       const discountedAmount = useDiscount ? (amount * discountRate) : amount;
@@ -331,45 +329,26 @@
       const totalFees = tebexFee + paypalFee;
       const finalAmount = discountedAmount - totalFees;
 
-      const labels = {
-        originalAmount: { zh: '原始金額:', en: 'Original Amount:' },
-        discountAmount: { zh: '折扣金額:', en: 'Discount Amount:' },
-        discountedAmount: { zh: '折扣後金額:', en: 'Discounted Amount:' },
-        tebexFee: { zh: 'Tebex 費用 (10%):', en: 'Tebex Fee (10%):' },
-        paypalFee: { zh: 'PayPal 費用 (2.9% + $0.30):', en: 'PayPal Fee (2.9% + $0.30):' },
-        totalFee: { zh: '總費用:', en: 'Total Fee:' },
-        finalAmount: { zh: '最終收到金額:', en: 'Final Amount:' }
-      };
-
       document.getElementById('tebex-results').innerHTML = `
-<div class="result-row">
-          <span>${labels.tebexFee[currentLang]}</span>
-          <div class="amount-display fee">
-            <div class="primary-amount">-$${tebexFee.toFixed(2)}</div>
-          </div>
+        <div class="result-row">
+          <span class="label">Tebex 10%</span>
+          <div class="amount-display fee">-$${tebexFee.toFixed(2)}</div>
         </div>
         <div class="result-row">
-          <span>${labels.paypalFee[currentLang]}</span>
-          <div class="amount-display fee">
-            <div class="primary-amount">-$${paypalFee.toFixed(2)}</div>
-          </div>
+          <span class="label">PayPal 2.9% + $0.30</span>
+          <div class="amount-display fee">-$${paypalFee.toFixed(2)}</div>
         </div>
-        <div class="result-row border-top">
-          <span>${labels.totalFee[currentLang]}</span>
-          <div class="amount-display fee">
-            <div class="primary-amount">-$${totalFees.toFixed(2)}</div>
-          </div>
+        <div class="result-row">
+          <span class="label">${currentLang === 'zh' ? '總費用' : 'Total Fee'}</span>
+          <div class="amount-display fee">-$${totalFees.toFixed(2)}</div>
         </div>
-        <div class="result-row border-top">
-          <span class="final-amount">${labels.finalAmount[currentLang]}</span>
-          <div class="amount-display">
-            <div class="final-amount">$${finalAmount.toFixed(2)}</div>
-          </div>
+        <div class="result-row">
+          <span class="label final-amount">${currentLang === 'zh' ? '最終收到金額' : 'Final Amount'}</span>
+          <div class="amount-display final-amount">$${finalAmount.toFixed(2)}</div>
         </div>
       `;
     }
 
-    // Initial calculations
     calculatePayPal();
     calculateTebex();
   </script>
